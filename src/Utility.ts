@@ -93,12 +93,19 @@ export namespace Utility {
     }
 
     export async function validateInstallPath(installPath: string): Promise<boolean> {
-        const configFileExists: Promise<boolean> = fse.pathExists(path.join(installPath, 'conf', 'server.xml'));
-        const serverWebFileExists: Promise<boolean> = fse.pathExists(path.join(installPath, 'conf', 'web.xml'));
-        const serverBootstrapJarFileExists: Promise<boolean> = fse.pathExists(path.join(installPath, 'bin', 'bootstrap.jar'));
-        const serverJuliJarFileExists: Promise<boolean> = fse.pathExists(path.join(installPath, 'bin', 'tomcat-juli.jar'));
+        const configFileExists: Promise<boolean> = fse.pathExists(path.join(installPath, 'standalone/configuration', 'standalone.xml'));
+        const configFileExists2: Promise<boolean> = fse.pathExists(path.join(installPath, 'standalone/configuration', 'mgmt-users.properties'));
+        const configFileExists3: Promise<boolean> = fse.pathExists(path.join(installPath, 'standalone/configuration', 'mgmt-groups.properties'));
+        const configFileExists4: Promise<boolean> = fse.pathExists(path.join(installPath, 'standalone/configuration', 'application-roles.properties'));
+        const configFileExists5: Promise<boolean> = fse.pathExists(path.join(installPath, 'standalone/configuration', 'application-users.properties'));
+        const serverBootstrapJarFileExists: Promise<boolean> = fse.pathExists(path.join(installPath, 'jboss-modules.jar'));
 
-        return await configFileExists && await serverWebFileExists && await serverBootstrapJarFileExists && await serverJuliJarFileExists;
+        return await configFileExists
+            && await configFileExists2
+            && await configFileExists3
+            && await configFileExists4
+            && await configFileExists5
+            && await serverBootstrapJarFileExists;
     }
 
     export async function needRestart(httpPort: string, httpsPort: string, serverConfog: string): Promise<boolean> {

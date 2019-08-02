@@ -47,17 +47,8 @@ export class TomcatModel {
         const catalinaBase: string = server.getStoragePath();
         const bootStrap: string = path.join(installPath, 'bin', 'bootstrap.jar');
         const tomcat: string = path.join(installPath, 'bin', 'tomcat-juli.jar');
-        let result: string[] = [
-            `${Constants.CLASS_PATH_KEY} "${[bootStrap, tomcat].join(path.delimiter)}"`,
-            `${Constants.CATALINA_BASE_KEY}="${catalinaBase}"`,
-            `${Constants.CATALINA_HOME_KEY}="${installPath}"`,
-            `${Constants.ENCODING}`
-        ];
+        let result: string[] = [];
 
-        if (!await fse.pathExists(server.jvmOptionFile)) {
-            server.jvmOptions = result.concat([Constants.BOOTSTRAP_FILE, '"$@"']);
-            return;
-        }
         const filterFunction: (para: string) => boolean = (para: string): boolean => {
             if (!para.startsWith('-')) {
                 return false;
@@ -72,15 +63,8 @@ export class TomcatModel {
             return valid;
         };
         result = result.concat(await Utility.readFileLineByLine(server.jvmOptionFile, filterFunction));
-        const tmpDirConfiguration: string = result.find((element: string) => {
-            return element.indexOf(Constants.JAVA_IO_TEMP_DIR_KEY) >= 0;
-        });
-        if (!tmpDirConfiguration) {
-            result = result.concat(`${Constants.JAVA_IO_TEMP_DIR_KEY}="${path.join(catalinaBase, 'temp')}"`);
-        }
-        server.jvmOptions = result.concat([Constants.BOOTSTRAP_FILE, '"$@"']);
+        server.jvmOptions = result;
     }
-
     public deleteServer(tomcatServer: TomcatServer): boolean {
         const index: number = this._serverList.findIndex((item: TomcatServer) => item.getName() === tomcatServer.getName());
         if (index > -1) {

@@ -105,15 +105,24 @@ export class TomcatController {
         await fse.remove(catalinaBasePath);
         Utility.trackTelemetryStep('copy files');
         await Promise.all([
-            fse.copy(path.join(tomcatInstallPath, 'conf'), path.join(catalinaBasePath, 'conf')),
-            fse.copy(path.join(this._extensionPath, 'resources', 'jvm.options'), path.join(catalinaBasePath, 'jvm.options')),
-            fse.copy(path.join(this._extensionPath, 'resources', 'index.jsp'), path.join(catalinaBasePath, 'webapps', 'ROOT', 'index.jsp')),
-            fse.copy(path.join(this._extensionPath, 'resources', 'icon.png'), path.join(catalinaBasePath, 'webapps', 'ROOT', 'icon.png')),
-            fse.mkdirs(path.join(catalinaBasePath, 'logs')),
-            fse.mkdirs(path.join(catalinaBasePath, 'temp')),
-            fse.mkdirs(path.join(catalinaBasePath, 'work'))
+            fse.copy(path.join(tomcatInstallPath, 'jboss-modules.jar'), path.join(catalinaBasePath, 'jboss-modules.jar')),
+            fse.copy(path.join(tomcatInstallPath, 'bin'), path.join(catalinaBasePath, 'bin')),
+            fse.copy(path.join(tomcatInstallPath, 'domain'), path.join(catalinaBasePath, 'domain')),
+            fse.copy(path.join(tomcatInstallPath, 'modules'), path.join(catalinaBasePath, 'modules')),
+            fse.copy(path.join(tomcatInstallPath, 'standalone'), path.join(catalinaBasePath, 'standalone')),
+            fse.remove(path.join(catalinaBasePath, 'standalone/data')),
+            fse.remove(path.join(catalinaBasePath, 'standalone/deployments')),
+            fse.remove(path.join(catalinaBasePath, 'standalone/log')),
+            fse.remove(path.join(catalinaBasePath, 'standalone/tmp')),
+
+            fse.mkdirs(path.join(catalinaBasePath, 'standalone/data')),
+            fse.mkdirs(path.join(catalinaBasePath, 'standalone/deployments')),
+            fse.mkdirs(path.join(catalinaBasePath, 'standalone/log')),
+            fse.mkdirs(path.join(catalinaBasePath, 'standalone/tmp')),
+
+            fse.copy(path.join(this._extensionPath, 'resources', 'jvm.options'), path.join(catalinaBasePath, 'jvm.options'))
         ]);
-        await Utility.copyServerConfig(path.join(tomcatInstallPath, 'conf', 'server.xml'), path.join(catalinaBasePath, 'conf', 'server.xml'));
+        // await Utility.copyServerConfig(path.join(tomcatInstallPath, 'conf', 'server.xml'), path.join(catalinaBasePath, 'conf', 'server.xml'));
         const tomcatServer: TomcatServer = new TomcatServer(serverName, tomcatInstallPath, catalinaBasePath);
         Utility.trackTelemetryStep('add server');
         this._tomcatModel.addServer(tomcatServer);
@@ -453,11 +462,9 @@ export class TomcatController {
             });
 
             let startArguments: string[] = serverInfo.jvmOptions.slice();
-            if (serverInfo.getDebugPort()) {
-                startArguments = [`${Constants.DEBUG_ARGUMENT_KEY}${serverInfo.getDebugPort()}`].concat(startArguments);
-            }
-            startArguments.push('start');
-            const javaProcess: Promise<void> = Utility.executeCMD(this._outputChannel, serverInfo.getName(), 'java', { shell: true }, ...startArguments);
+
+            const initScript = path.join(serverInfo.getStoragePath(), '/bin/standalone.sh');
+            const javaProcess: Promise<void> = Utility.executeCMD(this._outputChannel, serverInfo.getName(), initScript, { shell: true }, ...startArguments);
             serverInfo.setStarted(true);
             this.startDebugSession(serverInfo);
             await javaProcess;

@@ -1,4 +1,4 @@
-Tomcat for Java in Visual Studio Code
+Wildfly for Java in Visual Studio Code
 Copyright (c) Microsoft Corporation
 All rights reserved.
 

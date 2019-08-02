@@ -23,7 +23,7 @@ export class TomcatServer extends vscode.TreeItem implements vscode.QuickPickIte
         super(_name);
         this.label = _name;
         this.jvmOptionFile = path.join(_storagePath, Constants.JVM_OPTION_FILE);
-        this._configurationPath = path.join(_storagePath, 'conf', 'server.xml');
+        this._configurationPath = path.join(_storagePath, 'standalone/configuration', 'standalone.xml');
         this.basePathName = path.basename(_storagePath);
     }
 

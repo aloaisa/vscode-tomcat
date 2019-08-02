@@ -1,23 +1,22 @@
-# Tomcat for Visual Studio Code
-[![Build Status](https://travis-ci.org/adashen/vscode-tomcat.svg?branch=master)](https://travis-ci.org/adashen/vscode-tomcat)
+# Wildfly for Visual Studio Code
 
 ## Usage
 
 ![start and run](resources/Tomcat.gif)
 
 ## Features
-* Add Tomcat Server from Tomcat Install Path
-* Start/Restart Tomcat Server from VSCode
-* Run war package on Tomcat Server
-* Debug war package on Tomcat Server
-* Run exploded war on Tomcat Server
-* Debug exploded war on Tomcat Server
+* Add Wildfly Server from Wildfly Install Path
+* Start/Restart Wildfly Server from VSCode
+* Run war package on Wildfly Server
+* Debug war package on Wildfly Server
+* Run exploded war on Wildfly Server
+* Debug exploded war on Wildfly Server
 * Open server homepage in browser to check all deployed war packages
-* View all deployed war packages in Tomcat Explorer
+* View all deployed war packages in Wildfly Explorer
 * Open war package homepage in browser
-* Stop Tomcat Server
-* Rename Tomcat Server
-* Customize JVM Options when starting Tomcat Server
+* Stop Wildfly Server
+* Rename Wildfly Server
+* Customize JVM Options when starting Wildfly Server
 * Reveal deployed war packages in file explorer
 * Delete deployed war package
 
@@ -25,9 +24,9 @@
 * [Apache Tomcat](http://tomcat.apache.org/)
 * [Debugger for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug) (for debuging war package)
 
-## Contributing
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+## Install
+1º ```rm -rf node_modues package-lock.json```
+2º ```npm install```
 
 ## Release Notes
 Refer to [CHANGELOG](CHANGELOG.md)

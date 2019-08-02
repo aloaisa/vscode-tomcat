@@ -1,4 +1,4 @@
-# custom Tomcat Server JVM options
+# custom Wildfly Server JVM options
 
 # All configurations start with '-' will be loaded during stating JVM.
 # You need to restart the server for the configurations to take effect.
@@ -10,3 +10,6 @@
 
 #-Xms${heap.min}
 #-Xmx${heap.max}
+
+--debug
+--server-config=g2903_desarrollo.xml
