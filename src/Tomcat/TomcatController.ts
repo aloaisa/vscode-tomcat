@@ -172,7 +172,15 @@ export class TomcatController {
                 server.clearDebugInfo();
             }
             server.needRestart = restart;
-            await Utility.executeCMD(this._outputChannel, server.getName(), 'java', { shell: true }, ...server.jvmOptions.concat('stop'));
+            const initScript = path.join(server.getStoragePath(), '/bin/jboss-cli.sh');
+            let stopParameters = ["--connect"];
+            if (restart) {
+                stopParameters.push("command=:reload");
+            } else {
+                stopParameters.push("command=:shutdown");
+            }
+
+            await Utility.executeCMD(this._outputChannel, server.getName(), initScript, { shell: true }, ...stopParameters);
         }
     }
 
