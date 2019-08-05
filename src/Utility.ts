@@ -158,10 +158,19 @@ export namespace Utility {
         try {
             const jsonObj: any = await parseXml(xml);
             if (kind === Constants.PortKind.Server) {
-                port = jsonObj.Server.$.port;
+                port = jsonObj.server.$.port;
             } else if (kind === Constants.PortKind.Http) {
-                port = jsonObj.Server.Service.find((item: any) => item.$.name === Constants.CATALINA).Connector.find((item: any) =>
-                    (item.$.protocol === undefined || item.$.protocol.startsWith(Constants.HTTP))).$.port;
+                const socketBindingGroup = jsonObj.server['socket-binding-group']
+                if (socketBindingGroup && socketBindingGroup.length > 0) {
+                    const socketBinding = socketBindingGroup[0]['socket-binding']
+                        .find(
+                            (item) => item.$.name === Constants.PortKind.Http.toLocaleLowerCase()
+                        );
+                    const portProperty = socketBinding.$.port
+                    port = portProperty.split(":")[1].substring(0, portProperty.split(":")[1].length -1);
+                } else {
+                    port = undefined;
+                }
             } else if (kind === Constants.PortKind.Https) {
                 port = jsonObj.Server.Service.find((item: any) => item.$.name === Constants.CATALINA).Connector.find((item: any) =>
                     (item.$.SSLEnabled.toLowerCase() === 'true')).$.port;
