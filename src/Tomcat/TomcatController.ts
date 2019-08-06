@@ -7,7 +7,6 @@ import * as _ from "lodash";
 // tslint:disable-next-line:no-require-imports
 import opn = require("opn");
 import * as path from "path";
-import * as portfinder from "portfinder";
 import { URL } from "url";
 import { MessageItem } from "vscode";
 import * as vscode from "vscode";
@@ -124,6 +123,7 @@ export class TomcatController {
         ]);
         // await Utility.copyServerConfig(path.join(tomcatInstallPath, 'conf', 'server.xml'), path.join(catalinaBasePath, 'conf', 'server.xml'));
         const tomcatServer: TomcatServer = new TomcatServer(serverName, tomcatInstallPath, catalinaBasePath);
+        tomcatServer.setDebugPort(8787);
         Utility.trackTelemetryStep('add server');
         this._tomcatModel.addServer(tomcatServer);
         return tomcatServer;
@@ -172,7 +172,7 @@ export class TomcatController {
                 server.clearDebugInfo();
             }
             server.needRestart = restart;
-            const initScript = path.join(server.getStoragePath(), '/bin/jboss-cli.sh');
+            const initScript = '\"' + path.join(server.getStoragePath(), '/bin/jboss-cli.sh\"');
             let stopParameters = ["--connect"];
             if (restart) {
                 stopParameters.push("command=:reload");
@@ -325,7 +325,7 @@ export class TomcatController {
             return;
         }
         Utility.trackTelemetryStep('get debug port');
-        const port: number = await portfinder.getPortPromise();
+        const port: number = await server.getDebugPort();
         server.setDebugInfo(port, workspaceFolder);
     }
 
@@ -359,59 +359,22 @@ export class TomcatController {
         if (!server || !await fse.pathExists(webappPath)) {
             return;
         }
-        const appName: string = await this.determineAppName(webappPath, server);
-        const appPath: string = path.join(server.getStoragePath(), 'webapps', appName);
-
-        await fse.remove(appPath);
-        await fse.mkdirs(appPath);
         if (this.isWarFile(webappPath)) {
             Utility.trackTelemetryStep('deploy war');
-            await Utility.executeCMD(this._outputChannel, server.getName(), 'jar', { cwd: appPath }, 'xvf', `${webappPath}`);
+            const deploymentsDirectory = path.join(this._tomcatModel.defaultStoragePath, '/tomcat/', server.basePathName, '/standalone/deployments/');
+            await fse.remove(deploymentsDirectory);
+            await fse.mkdirs(deploymentsDirectory);
+
+            await Utility.executeCMD(this._outputChannel, server.getName(), 'cp', { shell: true }, '\"' + webappPath + '\"', '\"' + deploymentsDirectory + 'suat.war\"');
         } else {
-            Utility.trackTelemetryStep('deploy web app folder');
-            await fse.copy(webappPath, appPath);
+            Utility.trackTelemetryStep('no war file');
+            throw new Error(DialogMessage.invalidWarFile);
         }
         vscode.commands.executeCommand('tomcat.tree.refresh');
     }
 
     private isWarFile(filePath: string): boolean {
         return path.extname(filePath).toLocaleLowerCase() === '.war';
-    }
-
-    /* tslint:disable:no-any */
-    private async determineAppName(webappPath: string, server: TomcatServer): Promise<string> {
-        const defaultName: string = path.basename(webappPath, path.extname(webappPath));
-        let appName: string = defaultName;
-        let folderLocation: string;
-        if (this.isWarFile(webappPath)) {
-            folderLocation = path.join(this._tomcatModel.defaultStoragePath, defaultName);
-            await fse.remove(folderLocation);
-            await fse.mkdir(folderLocation);
-            await Utility.executeCMD(this._outputChannel, server.getName(), 'jar', { cwd: folderLocation }, 'xvf', `${webappPath}`);
-        } else {
-            folderLocation = webappPath;
-        }
-        if (await fse.pathExists(path.join(folderLocation, 'META-INF', 'context.xml'))) {
-            const xml: string = fs.readFileSync(path.join(folderLocation, 'META-INF', 'context.xml'), 'utf8');
-            const jsonFromXml: any = await Utility.parseXml(xml);
-            if (jsonFromXml) {
-                if (jsonFromXml.Context && jsonFromXml.Context.$ && jsonFromXml.Context.$.path) {
-                    appName = this.parseContextPathToFolderName(jsonFromXml.Context.$.path);
-                } else if (jsonFromXml.context && jsonFromXml.context.$ && jsonFromXml.context.$.path) {
-                    appName = this.parseContextPathToFolderName(jsonFromXml.context.$.path);
-                }
-            }
-        }
-        return appName;
-    }
-    /* tsline:enable:no-any */
-
-    private parseContextPathToFolderName(context: string): string {
-        if (context === '/' || context === '') {
-            return 'ROOT';
-        }
-        const replacedSlashes: string = context.replace('/', '#');
-        return replacedSlashes.startsWith('#') ? replacedSlashes.substring(1) : replacedSlashes;
     }
 
     private startDebugSession(server: TomcatServer): void {
@@ -423,7 +386,8 @@ export class TomcatController {
             name: `${Constants.DEBUG_SESSION_NAME}_${server.basePathName}`,
             request: 'attach',
             hostName: 'localhost',
-            port: server.getDebugPort()
+            port: server.getDebugPort(),
+            timeout: 10000
         };
         Utility.trackTelemetryStep('start debug');
         setTimeout(() => vscode.debug.startDebugging(server.getDebugWorkspace(), config), 500);
@@ -471,7 +435,7 @@ export class TomcatController {
 
             let startArguments: string[] = serverInfo.jvmOptions.slice();
 
-            const initScript = path.join(serverInfo.getStoragePath(), '/bin/standalone.sh');
+            const initScript = '\"' + path.join(serverInfo.getStoragePath(), '/bin/standalone.sh') + '\"';
             const javaProcess: Promise<void> = Utility.executeCMD(this._outputChannel, serverInfo.getName(), initScript, { shell: true }, ...startArguments);
             serverInfo.setStarted(true);
             this.startDebugSession(serverInfo);

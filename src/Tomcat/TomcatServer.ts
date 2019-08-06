@@ -39,6 +39,10 @@ export class TomcatServer extends vscode.TreeItem implements vscode.QuickPickIte
         this._debugWorkspace = undefined;
     }
 
+    public setDebugPort(port: number): void {
+        this._debugPort = port;
+    }
+
     public getDebugPort(): number {
         return this._debugPort;
     }
