@@ -2,7 +2,6 @@ import * as assert from "assert";
 import * as path from "path";
 import * as portfinder from "portfinder";
 import * as Constants from "../src/Constants";
-import { TomcatServer } from "../src/Tomcat/TomcatServer";
 import { Utility } from "../src/Utility";
 
 suite('utility tests', () => {

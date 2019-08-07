@@ -1,17 +1,16 @@
 {
-  "name": "vscode-tomcat",
-  "displayName": "Tomcat for Java",
+  "name": "vscode-wildfly",
+  "displayName": "Wildfly for Java",
   "description": "%extension.description%",
   "version": "0.11.1",
-  "publisher": "adashen",
-  "aiKey": "174d54c8-21db-4808-8a41-1ddb08d97147",
+  "publisher": "aloaisa",
   "icon": "resources/icon.png",
   "engines": {
     "vscode": "^1.22.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/adashen/vscode-tomcat"
+    "url": "https://github.com/aloaisa/vscode-tomcat"
   },
   "categories": [
     "Programming Languages",
@@ -19,336 +18,336 @@
   ],
   "keywords": [
     "Java",
-    "Tomcat"
+    "Wildfly"
   ],
-  "homepage": "https://github.com/adashen/vscode-tomcat/blob/master/README.md",
+  "homepage": "https://github.com/aloaisa/vscode-tomcat/blob/master/README.md",
   "activationEvents": [
-    "onCommand:tomcat.tree.refresh",
-    "onCommand:tomcat.config.open",
-    "onCommand:tomcat.server.add",
-    "onCommand:tomcat.server.stop",
-    "onCommand:tomcat.server.delete",
-    "onCommand:tomcat.server.start",
-    "onCommand:tomcat.server.restart",
-    "onCommand:tomcat.server.rename",
-    "onCommand:tomcat.server.browse",
-    "onCommand:tomcat.server.debug",
-    "onCommand:tomcat.war.run",
-    "onCommand:tomcat.war.debug",
-    "onCommand:tomcat.war.browse",
-    "onCommand:tomcat.war.reveal",
-    "onCommand:tomcat.war.delete",
-    "onCommand:tomcat.package",
-    "onCommand:tomcat.webapp.run",
-    "onCommand:tomcat.webapp.debug",
-    "onView:tomcatServerExplorer"
+    "onCommand:wildfly.tree.refresh",
+    "onCommand:wildfly.config.open",
+    "onCommand:wildfly.server.add",
+    "onCommand:wildfly.server.stop",
+    "onCommand:wildfly.server.delete",
+    "onCommand:wildfly.server.start",
+    "onCommand:wildfly.server.restart",
+    "onCommand:wildfly.server.rename",
+    "onCommand:wildfly.server.browse",
+    "onCommand:wildfly.server.debug",
+    "onCommand:wildfly.war.run",
+    "onCommand:wildfly.war.debug",
+    "onCommand:wildfly.war.browse",
+    "onCommand:wildfly.war.reveal",
+    "onCommand:wildfly.war.delete",
+    "onCommand:wildfly.package",
+    "onCommand:wildfly.webapp.run",
+    "onCommand:wildfly.webapp.debug",
+    "onView:wildflyServerExplorer"
   ],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [
       {
-        "command": "tomcat.tree.refresh",
-        "title": "Refresh Tomcat Server Tree",
-        "category": "Tomcat",
+        "command": "wildfly.tree.refresh",
+        "title": "Refresh Wildfly Server Tree",
+        "category": "Wildfly",
         "icon": {
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
         }
       },
       {
-        "command": "tomcat.server.add",
-        "title": "Add Tomcat Server",
-        "category": "Tomcat",
+        "command": "wildfly.server.add",
+        "title": "Add Wildfly Server",
+        "category": "Wildfly",
         "icon": {
           "light": "resources/light/add.svg",
           "dark": "resources/dark/add.svg"
         }
       },
       {
-        "command": "tomcat.war.run",
-        "title": "Run on Tomcat Server",
-        "category": "Tomcat"
+        "command": "wildfly.war.run",
+        "title": "Run on Wildfly Server",
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.war.browse",
+        "command": "wildfly.war.browse",
         "title": "Open in Browser",
-        "category": "Tomcat"
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.stop",
-        "title": "Stop Tomcat Server",
-        "category": "Tomcat"
+        "command": "wildfly.server.stop",
+        "title": "Stop Wildfly Server",
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.war.debug",
-        "title": "Debug on Tomcat Server",
-        "category": "Tomcat"
+        "command": "wildfly.war.debug",
+        "title": "Debug on Wildfly Server",
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.delete",
-        "title": "Delete Tomcat Server",
-        "category": "Tomcat"
+        "command": "wildfly.server.delete",
+        "title": "Delete Wildfly Server",
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.config.open",
+        "command": "wildfly.config.open",
         "title": "Open Server Configuration",
-        "category": "Tomcat"
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.start",
-        "title": "Start Tomcat Server",
-        "category": "Tomcat"
+        "command": "wildfly.server.start",
+        "title": "Start Wildfly Server",
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.restart",
-        "title": "Restart Tomcat Server",
-        "category": "Tomcat"
+        "command": "wildfly.server.restart",
+        "title": "Restart Wildfly Server",
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.rename",
-        "title": "Rename Tomcat Server",
-        "category": "Tomcat"
+        "command": "wildfly.server.rename",
+        "title": "Rename Wildfly Server",
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.browse",
+        "command": "wildfly.server.browse",
         "title": "Open in Browser",
-        "category": "Tomcat"
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.debug",
+        "command": "wildfly.server.debug",
         "title": "Debug War Package"
       },
       {
-        "command": "tomcat.package",
+        "command": "wildfly.package",
         "title": "Generate War Package from Current Folder",
-        "category": "Tomcat"
+        "category": "Wildfly"
       },
       {
-        "command": "tomcat.server.customizejvmoptions",
+        "command": "wildfly.server.customizejvmoptions",
         "title": "Customize JVM Options"
       },
       {
-        "command": "tomcat.server.delete.context",
+        "command": "wildfly.server.delete.context",
         "title": "Delete"
       },
       {
-        "command": "tomcat.server.start.context",
+        "command": "wildfly.server.start.context",
         "title": "Start"
       },
       {
-        "command": "tomcat.server.restart.context",
+        "command": "wildfly.server.restart.context",
         "title": "Restart"
       },
       {
-        "command": "tomcat.server.rename.context",
+        "command": "wildfly.server.rename.context",
         "title": "Rename"
       },
       {
-        "command": "tomcat.server.stop.context",
+        "command": "wildfly.server.stop.context",
         "title": "Stop"
       },
       {
-        "command": "tomcat.war.browse",
+        "command": "wildfly.war.browse",
         "title": "Open in Browser"
       },
       {
-        "command": "tomcat.war.delete",
+        "command": "wildfly.war.delete",
         "title": "Delete"
       },
       {
-        "command": "tomcat.war.reveal",
+        "command": "wildfly.war.reveal",
         "title": "Reveal in Explorer"
       },
       {
-        "command": "tomcat.webapp.run",
-        "title": "Run on Tomcat Server"
+        "command": "wildfly.webapp.run",
+        "title": "Run on Wildfly Server"
       },
       {
-        "command": "tomcat.webapp.debug",
-        "title": "Debug on Tomcat Server"
+        "command": "wildfly.webapp.debug",
+        "title": "Debug on Wildfly Server"
       }
     ],
     "views": {
       "explorer": [
         {
-          "id": "tomcatServerExplorer",
-          "name": "Tomcat Servers"
+          "id": "wildflyServerExplorer",
+          "name": "Wildfly Servers"
         }
       ]
     },
     "menus": {
       "view/title": [
         {
-          "command": "tomcat.tree.refresh",
-          "when": "view == tomcatServerExplorer",
+          "command": "wildfly.tree.refresh",
+          "when": "view == wildflyServerExplorer",
           "group": "navigation@0"
         },
         {
-          "command": "tomcat.server.add",
-          "when": "view == tomcatServerExplorer",
+          "command": "wildfly.server.add",
+          "when": "view == wildflyServerExplorer",
           "group": "navigation@1"
         }
       ],
       "commandPalette": [
         {
-          "command": "tomcat.server.browse",
+          "command": "wildfly.server.browse",
           "when": "never"
         },
         {
-          "command": "tomcat.tree.refresh",
+          "command": "wildfly.tree.refresh",
           "when": "never"
         },
         {
-          "command": "tomcat.config.open",
+          "command": "wildfly.config.open",
           "when": "never"
         },
         {
-          "command": "tomcat.war.browse",
+          "command": "wildfly.war.browse",
           "when": "never"
         },
         {
-          "command": "tomcat.server.start.context",
+          "command": "wildfly.server.start.context",
           "when": "never"
         },
         {
-          "command": "tomcat.server.restart.context",
+          "command": "wildfly.server.restart.context",
           "when": "never"
         },
         {
-          "command": "tomcat.server.rename.context",
+          "command": "wildfly.server.rename.context",
           "when": "never"
         },
         {
-          "command": "tomcat.server.delete.context",
+          "command": "wildfly.server.delete.context",
           "when": "never"
         },
         {
-          "command": "tomcat.server.stop.context",
+          "command": "wildfly.server.stop.context",
           "when": "never"
         },
         {
-          "command": "tomcat.war.delete",
+          "command": "wildfly.war.delete",
           "when": "never"
         },
         {
-          "command": "tomcat.server.customizejvmoptions",
+          "command": "wildfly.server.customizejvmoptions",
           "when": "never"
         },
         {
-          "command": "tomcat.war.reveal",
+          "command": "wildfly.war.reveal",
           "when": "never"
         },
         {
-          "command": "tomcat.server.debug",
+          "command": "wildfly.server.debug",
           "when": "never"
         },
         {
-          "command": "tomcat.webapp.run",
+          "command": "wildfly.webapp.run",
           "when": "never"
         },
         {
-          "command": "tomcat.webapp.debug",
+          "command": "wildfly.webapp.debug",
           "when": "never"
         }
       ],
       "explorer/context": [
         {
-          "command": "tomcat.war.run",
+          "command": "wildfly.war.run",
           "when": "explorerResourceIsFolder == false && resourceExtname == .war"
         },
         {
-          "command": "tomcat.war.debug",
+          "command": "wildfly.war.debug",
           "when": "explorerResourceIsFolder == false && resourceExtname == .war"
         },
         {
-          "command": "tomcat.webapp.run",
+          "command": "wildfly.webapp.run",
           "when": "explorerResourceIsFolder == true"
         },
         {
-          "command": "tomcat.webapp.debug",
+          "command": "wildfly.webapp.debug",
           "when": "explorerResourceIsFolder == true"
         }
       ],
       "view/item/context": [
         {
-          "command": "tomcat.server.start.context",
-          "when": "view == tomcatServerExplorer && viewItem == idleserver",
-          "group": "tomcat@0"
+          "command": "wildfly.server.start.context",
+          "when": "view == wildflyServerExplorer && viewItem == idleserver",
+          "group": "wildfly@0"
         },
         {
-          "command": "tomcat.server.stop.context",
-          "when": "view == tomcatServerExplorer && viewItem == runningserver",
-          "group": "tomcat@1"
+          "command": "wildfly.server.stop.context",
+          "when": "view == wildflyServerExplorer && viewItem == runningserver",
+          "group": "wildfly@1"
         },
         {
-          "command": "tomcat.server.restart.context",
-          "when": "view == tomcatServerExplorer && viewItem == runningserver",
-          "group": "tomcat@2"
+          "command": "wildfly.server.restart.context",
+          "when": "view == wildflyServerExplorer && viewItem == runningserver",
+          "group": "wildfly@2"
         },
         {
-          "command": "tomcat.server.rename.context",
-          "when": "view == tomcatServerExplorer && viewItem && viewItem != war",
-          "group": "tomcat@3"
+          "command": "wildfly.server.rename.context",
+          "when": "view == wildflyServerExplorer && viewItem && viewItem != war",
+          "group": "wildfly@3"
         },
         {
-          "command": "tomcat.server.browse",
-          "when": "view == tomcatServerExplorer && viewItem && viewItem != war",
-          "group": "tomcat@4"
+          "command": "wildfly.server.browse",
+          "when": "view == wildflyServerExplorer && viewItem && viewItem != war",
+          "group": "wildfly@4"
         },
         {
-          "command": "tomcat.config.open",
-          "when": "view == tomcatServerExplorer && viewItem && viewItem != war",
-          "group": "tomcat@5"
+          "command": "wildfly.config.open",
+          "when": "view == wildflyServerExplorer && viewItem && viewItem != war",
+          "group": "wildfly@5"
         },
         {
-          "command": "tomcat.server.customizejvmoptions",
-          "when": "view == tomcatServerExplorer && viewItem && viewItem != war",
-          "group": "tomcat@6"
+          "command": "wildfly.server.customizejvmoptions",
+          "when": "view == wildflyServerExplorer && viewItem && viewItem != war",
+          "group": "wildfly@6"
         },
         {
-          "command": "tomcat.server.debug",
-          "when": "view == tomcatServerExplorer && viewItem && viewItem != war",
-          "group": "tomcat@7"
+          "command": "wildfly.server.debug",
+          "when": "view == wildflyServerExplorer && viewItem && viewItem != war",
+          "group": "wildfly@7"
         },
         {
-          "command": "tomcat.server.delete.context",
-          "when": "view == tomcatServerExplorer && viewItem && viewItem != war",
-          "group": "tomcat@8"
+          "command": "wildfly.server.delete.context",
+          "when": "view == wildflyServerExplorer && viewItem && viewItem != war",
+          "group": "wildfly@8"
         },
         {
-          "command": "tomcat.war.browse",
-          "when": "view == tomcatServerExplorer && viewItem == war",
+          "command": "wildfly.war.browse",
+          "when": "view == wildflyServerExplorer && viewItem == war",
           "group": "war@0"
         },
         {
-          "command": "tomcat.server.add",
-          "when": "view == tomcatServerExplorer && !viewItem"
+          "command": "wildfly.server.add",
+          "when": "view == wildflyServerExplorer && !viewItem"
         },
         {
-          "command": "tomcat.war.reveal",
-          "when": "view == tomcatServerExplorer && viewItem == war",
+          "command": "wildfly.war.reveal",
+          "when": "view == wildflyServerExplorer && viewItem == war",
           "group": "war@1"
         },
         {
-          "command": "tomcat.war.delete",
-          "when": "view == tomcatServerExplorer && viewItem == war",
+          "command": "wildfly.war.delete",
+          "when": "view == wildflyServerExplorer && viewItem == war",
           "group": "war@2"
         }
       ]
     },
     "configuration": [
       {
-        "title": "Tomcat Configuration",
+        "title": "Wildfly Configuration",
         "properties": {
-          "tomcat.workspace": {
+          "wildfly.workspace": {
             "type": "string",
             "default": "",
-            "description": "Tomcat Servers workspace."
+            "description": "Wildfly Servers workspace."
           },
-          "tomcat.restart_when_http(s)_port_change": {
+          "wildfly.restart_when_http(s)_port_change": {
             "type": "boolean",
             "default": true,
-            "description": "Restart Tomcat Server or not when http(s) port changes"
+            "description": "Restart Wildfly Server or not when http(s) port changes"
           }
         }
       }

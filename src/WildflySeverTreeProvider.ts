@@ -7,16 +7,15 @@ import * as vscode from "vscode";
 import { TreeItem } from "vscode";
 import * as Constants from "./Constants";
 import { ServerState } from "./Constants";
-import { TomcatModel } from "./Tomcat/TomcatModel";
-import { TomcatServer } from "./Tomcat/TomcatServer";
-import { WarPackage } from "./Tomcat/WarPackage";
-import { Utility } from "./Utility";
+import { WildflyModel } from "./Wildfly/WildflyModel";
+import { WildflyServer } from "./Wildfly/WildflyServer";
+import { WarPackage } from "./Wildfly/WarPackage";
 
-export class TomcatSeverTreeProvider implements vscode.TreeDataProvider<TreeItem> {
+export class WildflySeverTreeProvider implements vscode.TreeDataProvider<TreeItem> {
     public _onDidChangeTreeData: vscode.EventEmitter<TreeItem> = new vscode.EventEmitter<TreeItem>();
     public readonly onDidChangeTreeData: vscode.Event<TreeItem> = this._onDidChangeTreeData.event;
 
-    constructor(private _context: vscode.ExtensionContext, private _tomcatModel: TomcatModel) {
+    constructor(private _context: vscode.ExtensionContext, private _wildflyModel: WildflyModel) {
         this._onDidChangeTreeData.fire();
     }
 
@@ -30,14 +29,14 @@ export class TomcatSeverTreeProvider implements vscode.TreeDataProvider<TreeItem
 
     public async getChildren(element?: TreeItem): Promise<TreeItem[]> {
         if (!element) {
-            return this._tomcatModel.getServerSet().map((server: TomcatServer) => {
+            return this._wildflyModel.getServerSet().map((server: WildflyServer) => {
                 server.iconPath = this._context.asAbsolutePath(path.join('resources', `${server.getState()}.svg`));
                 server.contextValue = server.getState();
                 server.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
                 return server;
             });
         } else if (element.contextValue === ServerState.IdleServer || element.contextValue === ServerState.RunningServer) {
-            const server: TomcatServer = <TomcatServer>element;
+            const server: WildflyServer = <WildflyServer>element;
             const webapps: string = path.join(server.getStoragePath(), 'webapps');
             const iconPath: string = this._context.asAbsolutePath(path.join('resources', 'war.jpg'));
             if (await fse.pathExists(webapps)) {

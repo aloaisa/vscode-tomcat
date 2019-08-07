@@ -2,11 +2,11 @@
 
 import * as vscode from "vscode";
 import { TelemetryWrapper } from "vscode-extension-telemetry-wrapper";
-import { TomcatController } from "./Tomcat/TomcatController";
-import { TomcatModel } from "./Tomcat/TomcatModel";
-import { TomcatServer } from "./Tomcat/TomcatServer";
-import { WarPackage } from "./Tomcat/WarPackage";
-import { TomcatSeverTreeProvider } from "./TomcatSeverTreeProvider";
+import { WildflyController } from "./Wildfly/WildflyController";
+import { WildflyModel } from "./Wildfly/WildflyModel";
+import { WildflyServer } from "./Wildfly/WildflyServer";
+import { WarPackage } from "./Wildfly/WarPackage";
+import { WildflySeverTreeProvider } from "./WildflySeverTreeProvider";
 import { Utility } from "./Utility";
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -15,40 +15,40 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     if (!storagePath) {
         storagePath = Utility.getTempStoragePath();
     }
-    const tomcatModel: TomcatModel = new TomcatModel(storagePath);
-    const tomcatServerTree: TomcatSeverTreeProvider = new TomcatSeverTreeProvider(context, tomcatModel);
-    const tomcatController: TomcatController = new TomcatController(tomcatModel, context.extensionPath);
+    const wildflyModel: WildflyModel = new WildflyModel(storagePath);
+    const wildflyServerTree: WildflySeverTreeProvider = new WildflySeverTreeProvider(context, wildflyModel);
+    const wildflyController: WildflyController = new WildflyController(wildflyModel, context.extensionPath);
 
-    context.subscriptions.push(tomcatController);
-    context.subscriptions.push(tomcatServerTree);
+    context.subscriptions.push(wildflyController);
+    context.subscriptions.push(wildflyServerTree);
 
-    context.subscriptions.push(vscode.window.registerTreeDataProvider('tomcatServerExplorer', tomcatServerTree));
-    context.subscriptions.push(registerCommandWrapper('tomcat.tree.refresh', (server: TomcatServer) => tomcatServerTree.refresh(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.war.browse', (war: WarPackage) => tomcatController.browseWarPackage(war)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.rename', (server: TomcatServer) => tomcatController.renameServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.add', () => tomcatController.addServer()));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.start', (server: TomcatServer) => tomcatController.startServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.restart', (server: TomcatServer) => tomcatController.stopOrRestartServer(server, true)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.stop', (server: TomcatServer) => tomcatController.stopOrRestartServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.delete', (server: TomcatServer) => tomcatController.deleteServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.browse', (server: TomcatServer) => tomcatController.browseServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.debug', (server: TomcatServer) => tomcatController.runOrDebugOnServer(undefined, true, server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.war.run', (uri: vscode.Uri) => tomcatController.runOrDebugOnServer(uri)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.war.debug', (uri: vscode.Uri) => tomcatController.runOrDebugOnServer(uri, true)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.webapp.run', (uri: vscode.Uri) => tomcatController.runOrDebugOnServer(uri)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.webapp.debug', (uri: vscode.Uri) => tomcatController.runOrDebugOnServer(uri, true)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.config.open', (server: TomcatServer) => tomcatController.openServerConfig(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.war.delete', (warPackage: WarPackage) => tomcatController.deleteWarPackage(warPackage)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.war.reveal', (warPackage: WarPackage) => tomcatController.revealWarPackage(warPackage)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.customizejvmoptions', (server: TomcatServer) => tomcatController.customizeJVMOptions(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.package', () => tomcatController.generateWarPackage()));
+    context.subscriptions.push(vscode.window.registerTreeDataProvider('wildflyServerExplorer', wildflyServerTree));
+    context.subscriptions.push(registerCommandWrapper('wildfly.tree.refresh', (server: WildflyServer) => wildflyServerTree.refresh(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.war.browse', (war: WarPackage) => wildflyController.browseWarPackage(war)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.rename', (server: WildflyServer) => wildflyController.renameServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.add', () => wildflyController.addServer()));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.start', (server: WildflyServer) => wildflyController.startServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.restart', (server: WildflyServer) => wildflyController.stopOrRestartServer(server, true)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.stop', (server: WildflyServer) => wildflyController.stopOrRestartServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.delete', (server: WildflyServer) => wildflyController.deleteServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.browse', (server: WildflyServer) => wildflyController.browseServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.debug', (server: WildflyServer) => wildflyController.runOrDebugOnServer(undefined, true, server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.war.run', (uri: vscode.Uri) => wildflyController.runOrDebugOnServer(uri)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.war.debug', (uri: vscode.Uri) => wildflyController.runOrDebugOnServer(uri, true)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.webapp.run', (uri: vscode.Uri) => wildflyController.runOrDebugOnServer(uri)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.webapp.debug', (uri: vscode.Uri) => wildflyController.runOrDebugOnServer(uri, true)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.config.open', (server: WildflyServer) => wildflyController.openServerConfig(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.war.delete', (warPackage: WarPackage) => wildflyController.deleteWarPackage(warPackage)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.war.reveal', (warPackage: WarPackage) => wildflyController.revealWarPackage(warPackage)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.customizejvmoptions', (server: WildflyServer) => wildflyController.customizeJVMOptions(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.package', () => wildflyController.generateWarPackage()));
 
     // .context commands are duplicate for better naming the context commands and make it more clear and elegant
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.rename.context', (server: TomcatServer) => tomcatController.renameServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.start.context', (server: TomcatServer) => tomcatController.startServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.restart.context', (server: TomcatServer) => tomcatController.stopOrRestartServer(server, true)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.stop.context', (server: TomcatServer) => tomcatController.stopOrRestartServer(server)));
-    context.subscriptions.push(registerCommandWrapper('tomcat.server.delete.context', (server: TomcatServer) => tomcatController.deleteServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.rename.context', (server: WildflyServer) => wildflyController.renameServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.start.context', (server: WildflyServer) => wildflyController.startServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.restart.context', (server: WildflyServer) => wildflyController.stopOrRestartServer(server, true)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.stop.context', (server: WildflyServer) => wildflyController.stopOrRestartServer(server)));
+    context.subscriptions.push(registerCommandWrapper('wildfly.server.delete.context', (server: WildflyServer) => wildflyController.deleteServer(server)));
 }
 
 // tslint:disable no-any

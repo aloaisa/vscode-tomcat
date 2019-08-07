@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Tomcat</title>
+		<title>Wildfly</title>
 		<meta charset="UTF-8"></meta>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	</head>
@@ -11,7 +11,7 @@
 						<img src="icon.png" alt="icon.png" style="height:128;">
 				</div>
 				<div class="col-md-11">
-					<h1 class="display-3">Tomcat for Visual Studio Code</h1>
+					<h1 class="display-3">Wildfly for Visual Studio Code</h1>
 				</div>
 			</div>
 		</div>
@@ -23,7 +23,7 @@
 			String webappsPath = f.getParent();
 			File webapps = new File(webappsPath);
 		%>
-			<div class="row"><h2>War Packages Deployed on this Tomcat Server:</h2></div>
+			<div class="row"><h2>War Packages Deployed on this Wildfly Server:</h2></div>
 			<div class="row" style="font-size: 22px;">
 				<ul class="list-group">
 				<%

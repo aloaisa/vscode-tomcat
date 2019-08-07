@@ -31,7 +31,7 @@ export namespace Utility {
             });
             p.on('exit', (code: number) => {
                 if (code !== 0) {
-                    reject(new Error(localize('tomcatExt.commandfailed', 'Command failed with exit code {0}', code)));
+                    reject(new Error(localize('wildflyExt.commandfailed', 'Command failed with exit code {0}', code)));
                 }
                 resolve();
             });
@@ -40,7 +40,7 @@ export namespace Utility {
 
     export async function openFile(file: string): Promise<void> {
         if (!await fse.pathExists(file)) {
-            throw new Error(localize('tomcatExt.fileNotExist', `File ${file} does not exist.`));
+            throw new Error(localize('wildflyExt.fileNotExist', `File ${file} does not exist.`));
         }
         vscode.window.showTextDocument(vscode.Uri.file(file), { preview: false });
     }
@@ -56,7 +56,7 @@ export namespace Utility {
     }
 
     export function disableAutoRestart(): void {
-        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('tomcat');
+        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('wildfly');
         if (config) {
             config.update(Constants.RESTART_CONFIG_ID, false, true);
         }
@@ -80,7 +80,7 @@ export namespace Utility {
     }
 
     async function getWorkspace(defaultStoragePath: string): Promise<string> {
-        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('tomcat');
+        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('wildfly');
         if (config) {
             // tslint:disable-next-line:no-backbone-get-set-outside-model
             const workspace: string = config.get<string>('workspace');
@@ -89,7 +89,7 @@ export namespace Utility {
                 return workspace;
             }
         }
-        return path.join(defaultStoragePath, 'tomcat');
+        return path.join(defaultStoragePath, 'wildfly');
     }
 
     export async function validateInstallPath(installPath: string): Promise<boolean> {
@@ -112,7 +112,7 @@ export namespace Utility {
         const newHttpPort: string = await getPort(serverConfog, Constants.PortKind.Http);
         const newHttpsPort: string = await getPort(serverConfog, Constants.PortKind.Https);
         let restartConfig: boolean = false;
-        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('tomcat');
+        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('wildfly');
         if (config) {
             restartConfig = config.get<boolean>(Constants.RESTART_CONFIG_ID);
         }
@@ -146,7 +146,7 @@ export namespace Utility {
             const idx: number = Math.floor(chars.length * Math.random());
             result += chars[idx];
         }
-        return path.resolve(os.tmpdir(), `vscodetomcat_${result}`);
+        return path.resolve(os.tmpdir(), `vscodewildfly_${result}`);
     }
 
     export async function getPort(serverXml: string, kind: Constants.PortKind): Promise<string> {

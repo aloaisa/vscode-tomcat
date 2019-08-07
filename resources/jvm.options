@@ -12,4 +12,4 @@
 #-Xmx${heap.max}
 
 --debug
---server-config=g2903_desarrollo.xml
+--server-config=standalone.xml

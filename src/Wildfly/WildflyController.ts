@@ -14,18 +14,18 @@ import { TelemetryWrapper } from "vscode-extension-telemetry-wrapper";
 import * as Constants from "../Constants";
 import { DialogMessage } from '../DialogMessage';
 import { Utility } from "../Utility";
-import { TomcatModel } from "./TomcatModel";
-import { TomcatServer } from "./TomcatServer";
+import { WildflyModel } from "./WildflyModel";
+import { WildflyServer } from "./WildflyServer";
 import { WarPackage } from "./WarPackage";
 
-export class TomcatController {
+export class WildflyController {
     private _outputChannel: vscode.OutputChannel;
-    constructor(private _tomcatModel: TomcatModel, private _extensionPath: string) {
-        this._outputChannel = vscode.window.createOutputChannel('vscode-tomcat');
+    constructor(private _wildflyModel: WildflyModel, private _extensionPath: string) {
+        this._outputChannel = vscode.window.createOutputChannel('vscode-wildfly');
     }
 
-    public async deleteServer(tomcatServer: TomcatServer): Promise<void> {
-        const server: TomcatServer = await this.precheck(tomcatServer);
+    public async deleteServer(wildflyServer: WildflyServer): Promise<void> {
+        const server: WildflyServer = await this.precheck(wildflyServer);
         if (server) {
             if (server.isStarted()) {
                 const confirmation: MessageItem = await vscode.window.showWarningMessage(DialogMessage.deleteConfirm, DialogMessage.yes, DialogMessage.cancel);
@@ -35,13 +35,13 @@ export class TomcatController {
                 }
                 await this.stopOrRestartServer(server);
             }
-            this._tomcatModel.deleteServer(server);
+            this._wildflyModel.deleteServer(server);
         }
     }
 
-    public async openServerConfig(tomcatServer: TomcatServer): Promise<void> {
-        if (tomcatServer) {
-            const configFile: string = tomcatServer.getServerConfigPath();
+    public async openServerConfig(wildflyServer: WildflyServer): Promise<void> {
+        if (wildflyServer) {
+            const configFile: string = wildflyServer.getServerConfigPath();
             if (!await fse.pathExists(configFile)) {
                 Utility.trackTelemetryStep('no configuration');
                 throw new Error(DialogMessage.noServerConfig);
@@ -53,7 +53,7 @@ export class TomcatController {
 
     public async browseWarPackage(warPackage: WarPackage): Promise<void> {
         if (warPackage) {
-            const server: TomcatServer = this._tomcatModel.getTomcatServer(warPackage.serverName);
+            const server: WildflyServer = this._wildflyModel.getWildflyServer(warPackage.serverName);
             const httpPort: string = await Utility.getPort(server.getServerConfigPath(), Constants.PortKind.Http);
             if (!server.isStarted()) {
                 const result: MessageItem = await vscode.window.showInformationMessage(DialogMessage.startServer, DialogMessage.yes, DialogMessage.no);
@@ -70,7 +70,7 @@ export class TomcatController {
     public async deleteWarPackage(warPackage: WarPackage): Promise<void> {
         if (warPackage) {
             await fse.remove(warPackage.storagePath);
-            vscode.commands.executeCommand('tomcat.tree.refresh');
+            vscode.commands.executeCommand('wildfly.tree.refresh');
         }
     }
 
@@ -80,7 +80,7 @@ export class TomcatController {
         }
     }
 
-    public async addServer(): Promise<TomcatServer> {
+    public async addServer(): Promise<WildflyServer> {
         Utility.trackTelemetryStep('select install path');
         const pathPick: vscode.Uri[] = await vscode.window.showOpenDialog({
             defaultUri: vscode.workspace.rootPath ? vscode.Uri.file(vscode.workspace.rootPath) : undefined,
@@ -91,24 +91,24 @@ export class TomcatController {
         if (_.isEmpty(pathPick) || !pathPick[0].fsPath) {
             return;
         }
-        const tomcatInstallPath: string = pathPick[0].fsPath;
-        if (!await Utility.validateInstallPath(tomcatInstallPath)) {
+        const wildflyInstallPath: string = pathPick[0].fsPath;
+        if (!await Utility.validateInstallPath(wildflyInstallPath)) {
             vscode.window.showErrorMessage(Constants.INVALID_SERVER_DIRECTORY);
             Utility.trackTelemetryStep('install path invalid');
             return;
         }
         Utility.trackTelemetryStep('construct server name');
-        const existingServerNames: string[] = this._tomcatModel.getServerSet().map((item: TomcatServer) => { return item.getName(); });
-        const serverName: string = await Utility.getServerName(tomcatInstallPath, this._tomcatModel.defaultStoragePath, existingServerNames);
-        const catalinaBasePath: string = await Utility.getServerStoragePath(this._tomcatModel.defaultStoragePath, serverName);
+        const existingServerNames: string[] = this._wildflyModel.getServerSet().map((item: WildflyServer) => { return item.getName(); });
+        const serverName: string = await Utility.getServerName(wildflyInstallPath, this._wildflyModel.defaultStoragePath, existingServerNames);
+        const catalinaBasePath: string = await Utility.getServerStoragePath(this._wildflyModel.defaultStoragePath, serverName);
         await fse.remove(catalinaBasePath);
         Utility.trackTelemetryStep('copy files');
         await Promise.all([
-            fse.copy(path.join(tomcatInstallPath, 'jboss-modules.jar'), path.join(catalinaBasePath, 'jboss-modules.jar')),
-            fse.copy(path.join(tomcatInstallPath, 'bin'), path.join(catalinaBasePath, 'bin')),
-            fse.copy(path.join(tomcatInstallPath, 'domain'), path.join(catalinaBasePath, 'domain')),
-            fse.copy(path.join(tomcatInstallPath, 'modules'), path.join(catalinaBasePath, 'modules')),
-            fse.copy(path.join(tomcatInstallPath, 'standalone'), path.join(catalinaBasePath, 'standalone')),
+            fse.copy(path.join(wildflyInstallPath, 'jboss-modules.jar'), path.join(catalinaBasePath, 'jboss-modules.jar')),
+            fse.copy(path.join(wildflyInstallPath, 'bin'), path.join(catalinaBasePath, 'bin')),
+            fse.copy(path.join(wildflyInstallPath, 'domain'), path.join(catalinaBasePath, 'domain')),
+            fse.copy(path.join(wildflyInstallPath, 'modules'), path.join(catalinaBasePath, 'modules')),
+            fse.copy(path.join(wildflyInstallPath, 'standalone'), path.join(catalinaBasePath, 'standalone')),
             fse.remove(path.join(catalinaBasePath, 'standalone/data')),
             fse.remove(path.join(catalinaBasePath, 'standalone/deployments')),
             fse.remove(path.join(catalinaBasePath, 'standalone/log')),
@@ -121,32 +121,32 @@ export class TomcatController {
 
             fse.copy(path.join(this._extensionPath, 'resources', 'jvm.options'), path.join(catalinaBasePath, 'jvm.options'))
         ]);
-        // await Utility.copyServerConfig(path.join(tomcatInstallPath, 'conf', 'server.xml'), path.join(catalinaBasePath, 'conf', 'server.xml'));
-        const tomcatServer: TomcatServer = new TomcatServer(serverName, tomcatInstallPath, catalinaBasePath);
-        tomcatServer.setDebugPort(8787);
+        // await Utility.copyServerConfig(path.join(wildflyInstallPath, 'conf', 'server.xml'), path.join(catalinaBasePath, 'conf', 'server.xml'));
+        const wildflyServer: WildflyServer = new WildflyServer(serverName, wildflyInstallPath, catalinaBasePath);
+        wildflyServer.setDebugPort(8787);
         Utility.trackTelemetryStep('add server');
-        this._tomcatModel.addServer(tomcatServer);
-        return tomcatServer;
+        this._wildflyModel.addServer(wildflyServer);
+        return wildflyServer;
     }
 
-    public async customizeJVMOptions(tomcatServer: TomcatServer): Promise<void> {
-        if (tomcatServer) {
-            if (!await fse.pathExists(tomcatServer.jvmOptionFile)) {
-                await fse.copy(path.join(this._extensionPath, 'resources', 'jvm.options'), path.join(tomcatServer.getStoragePath(), 'jvm.options'));
+    public async customizeJVMOptions(wildflyServer: WildflyServer): Promise<void> {
+        if (wildflyServer) {
+            if (!await fse.pathExists(wildflyServer.jvmOptionFile)) {
+                await fse.copy(path.join(this._extensionPath, 'resources', 'jvm.options'), path.join(wildflyServer.getStoragePath(), 'jvm.options'));
             }
-            Utility.openFile(tomcatServer.jvmOptionFile);
+            Utility.openFile(wildflyServer.jvmOptionFile);
         }
     }
 
-    public async renameServer(tomcatServer: TomcatServer): Promise<void> {
-        const server: TomcatServer = await this.precheck(tomcatServer);
+    public async renameServer(wildflyServer: WildflyServer): Promise<void> {
+        const server: WildflyServer = await this.precheck(wildflyServer);
         if (server) {
             const newName: string = await vscode.window.showInputBox({
                 prompt: 'input a new server name',
                 validateInput: (name: string): string => {
                     if (name && !name.match(/^[\w.-]+$/)) {
                         return 'please input a valid server name';
-                    } else if (this._tomcatModel.getTomcatServer(name)) {
+                    } else if (this._wildflyModel.getWildflyServer(name)) {
                         return 'the name was already taken, please re-input';
                     }
                     return null;
@@ -155,13 +155,13 @@ export class TomcatController {
             if (newName) {
                 Utility.trackTelemetryStep('rename');
                 server.rename(newName);
-                await this._tomcatModel.saveServerList();
+                await this._wildflyModel.saveServerList();
             }
         }
     }
 
-    public async stopOrRestartServer(tomcatServer: TomcatServer, restart: boolean = false): Promise<void> {
-        const server: TomcatServer = await this.precheck(tomcatServer);
+    public async stopOrRestartServer(wildflyServer: WildflyServer, restart: boolean = false): Promise<void> {
+        const server: WildflyServer = await this.precheck(wildflyServer);
         if (server) {
             if (!server.isStarted()) {
                 vscode.window.showInformationMessage(DialogMessage.serverStopped);
@@ -184,18 +184,18 @@ export class TomcatController {
         }
     }
 
-    public async startServer(tomcatServer: TomcatServer): Promise<void> {
-        const server: TomcatServer = tomcatServer ? tomcatServer : await this.selectServer(true);
+    public async startServer(wildflyServer: WildflyServer): Promise<void> {
+        const server: WildflyServer = wildflyServer ? wildflyServer : await this.selectServer(true);
         if (server) {
             if (server.isStarted()) {
                 vscode.window.showInformationMessage(DialogMessage.serverRunning);
                 return;
             }
-            await this.startTomcat(server);
+            await this.startWildfly(server);
         }
     }
 
-    public async runOrDebugOnServer(uri: vscode.Uri, debug?: boolean, server?: TomcatServer): Promise<void> {
+    public async runOrDebugOnServer(uri: vscode.Uri, debug?: boolean, server?: WildflyServer): Promise<void> {
         if (!uri) {
             Utility.trackTelemetryStep('select war');
             const dialog: vscode.Uri[] = await vscode.window.showOpenDialog({
@@ -231,21 +231,21 @@ export class TomcatController {
             await this.stopOrRestartServer(server, true);
         } else {
             Utility.trackTelemetryStep('start');
-            await this.startTomcat(server);
+            await this.startWildfly(server);
         }
     }
 
-    public async browseServer(tomcatServer: TomcatServer): Promise<void> {
-        if (tomcatServer) {
-            if (!tomcatServer.isStarted()) {
+    public async browseServer(wildflyServer: WildflyServer): Promise<void> {
+        if (wildflyServer) {
+            if (!wildflyServer.isStarted()) {
                 const result: MessageItem = await vscode.window.showInformationMessage(DialogMessage.startServer, DialogMessage.yes, DialogMessage.cancel);
                 if (result !== DialogMessage.yes) {
                     return;
                 }
-                this.startServer(tomcatServer);
+                this.startServer(wildflyServer);
             }
             Utility.trackTelemetryStep('get http port');
-            const httpPort: string = await Utility.getPort(tomcatServer.getServerConfigPath(), Constants.PortKind.Http);
+            const httpPort: string = await Utility.getPort(wildflyServer.getServerConfigPath(), Constants.PortKind.Http);
             Utility.trackTelemetryStep('browse server');
             opn(new URL(`${Constants.LOCALHOST}:${httpPort}`).toString());
         }
@@ -276,13 +276,13 @@ export class TomcatController {
     }
 
     public dispose(): void {
-        this._tomcatModel.getServerSet().forEach((element: TomcatServer) => {
+        this._wildflyModel.getServerSet().forEach((element: WildflyServer) => {
             if (element.isStarted()) {
                 this.stopOrRestartServer(element);
             }
             this._outputChannel.dispose();
         });
-        this._tomcatModel.saveServerListSync();
+        this._wildflyModel.saveServerListSync();
     }
 
     private async isWebappPathValid(webappPath: string): Promise<boolean> {
@@ -308,7 +308,7 @@ export class TomcatController {
         return true;
     }
 
-    private async prepareDebugInfo(server: TomcatServer, uri: vscode.Uri): Promise<void> {
+    private async prepareDebugInfo(server: WildflyServer, uri: vscode.Uri): Promise<void> {
         if (!server || !uri) {
             return;
         }
@@ -329,14 +329,14 @@ export class TomcatController {
         server.setDebugInfo(port, workspaceFolder);
     }
 
-    private async selectServer(createIfNoneServer: boolean = false): Promise<TomcatServer> {
-        let items: vscode.QuickPickItem[] = this._tomcatModel.getServerSet();
+    private async selectServer(createIfNoneServer: boolean = false): Promise<WildflyServer> {
+        let items: vscode.QuickPickItem[] = this._wildflyModel.getServerSet();
         if (_.isEmpty(items) && !createIfNoneServer) {
             return;
         }
         if (items.length === 1) {
             Utility.trackTelemetryStep('auto select the only server');
-            return <TomcatServer>items[0];
+            return <WildflyServer>items[0];
         }
         items = createIfNoneServer ? items.concat({ label: `$(plus) ${DialogMessage.addServer}`, description: '' }) : items;
         const pick: vscode.QuickPickItem = await vscode.window.showQuickPick(
@@ -345,7 +345,7 @@ export class TomcatController {
         );
 
         if (pick) {
-            if (pick instanceof TomcatServer) {
+            if (pick instanceof WildflyServer) {
                 Utility.trackTelemetryStep('select server');
                 return pick;
             } else {
@@ -355,13 +355,13 @@ export class TomcatController {
         }
     }
 
-    private async deployWebapp(server: TomcatServer, webappPath: string): Promise<void> {
+    private async deployWebapp(server: WildflyServer, webappPath: string): Promise<void> {
         if (!server || !await fse.pathExists(webappPath)) {
             return;
         }
         if (this.isWarFile(webappPath)) {
             Utility.trackTelemetryStep('deploy war');
-            const deploymentsDirectory = path.join(this._tomcatModel.defaultStoragePath, '/tomcat/', server.basePathName, '/standalone/deployments/');
+            const deploymentsDirectory = path.join(this._wildflyModel.defaultStoragePath, '/wildfly/', server.basePathName, '/standalone/deployments/');
             await fse.remove(deploymentsDirectory);
             await fse.mkdirs(deploymentsDirectory);
 
@@ -370,14 +370,14 @@ export class TomcatController {
             Utility.trackTelemetryStep('no war file');
             throw new Error(DialogMessage.invalidWarFile);
         }
-        vscode.commands.executeCommand('tomcat.tree.refresh');
+        vscode.commands.executeCommand('wildfly.tree.refresh');
     }
 
     private isWarFile(filePath: string): boolean {
         return path.extname(filePath).toLocaleLowerCase() === '.war';
     }
 
-    private startDebugSession(server: TomcatServer): void {
+    private startDebugSession(server: WildflyServer): void {
         if (!server || !server.getDebugPort() || !server.getDebugWorkspace()) {
             return;
         }
@@ -393,7 +393,7 @@ export class TomcatController {
         setTimeout(() => vscode.debug.startDebugging(server.getDebugWorkspace(), config), 500);
     }
 
-    private async startTomcat(serverInfo: TomcatServer): Promise<void> {
+    private async startWildfly(serverInfo: WildflyServer): Promise<void> {
         const serverName: string = serverInfo.getName();
         let watcher: chokidar.FSWatcher;
         const serverConfig: string = serverInfo.getServerConfigPath();
@@ -402,7 +402,7 @@ export class TomcatController {
         const httpsPort: string = await Utility.getPort(serverConfig, Constants.PortKind.Https);
 
         try {
-            await this._tomcatModel.updateJVMOptions(serverName);
+            await this._wildflyModel.updateJVMOptions(serverName);
             watcher = chokidar.watch(serverConfig);
             watcher.on('change', async () => {
                 if (serverPort !== await Utility.getPort(serverConfig, Constants.PortKind.Server)) {
@@ -444,7 +444,7 @@ export class TomcatController {
             watcher.close();
             if (serverInfo.needRestart) {
                 serverInfo.needRestart = false;
-                await this.startTomcat(serverInfo);
+                await this.startWildfly(serverInfo);
             }
         } catch (err) {
             serverInfo.setStarted(false);
@@ -453,11 +453,11 @@ export class TomcatController {
             vscode.window.showErrorMessage(err.toString());
         }
     }
-    private async precheck(tomcatServer: TomcatServer): Promise<TomcatServer> {
-        if (_.isEmpty(this._tomcatModel.getServerSet())) {
+    private async precheck(wildflyServer: WildflyServer): Promise<WildflyServer> {
+        if (_.isEmpty(this._wildflyModel.getServerSet())) {
             vscode.window.showInformationMessage(DialogMessage.noServer);
             return;
         }
-        return tomcatServer ? tomcatServer : await this.selectServer();
+        return wildflyServer ? wildflyServer : await this.selectServer();
     }
 }

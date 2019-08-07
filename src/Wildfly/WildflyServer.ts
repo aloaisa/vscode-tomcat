@@ -4,9 +4,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 import * as Constants from "../Constants";
 import { ServerState } from "../Constants";
-import { Utility } from "../Utility";
 
-export class TomcatServer extends vscode.TreeItem implements vscode.QuickPickItem {
+export class WildflyServer extends vscode.TreeItem implements vscode.QuickPickItem {
     public needRestart: boolean = false;
     public label: string;
     public description: string;
@@ -57,7 +56,7 @@ export class TomcatServer extends vscode.TreeItem implements vscode.QuickPickIte
 
     public setStarted(started: boolean): void {
         this._state = started ? ServerState.RunningServer : ServerState.IdleServer;
-        vscode.commands.executeCommand('tomcat.tree.refresh');
+        vscode.commands.executeCommand('wildfly.tree.refresh');
     }
 
     public isStarted(): boolean {

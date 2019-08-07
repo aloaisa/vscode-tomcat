@@ -2,17 +2,17 @@
 
 import * as assert from "assert";
 import { DialogMessage } from '../src/DialogMessage';
-import { TomcatController } from "../src/Tomcat/TomcatController";
-import { TomcatModel } from "../src/Tomcat/TomcatModel";
-import { TomcatServer } from "../src/Tomcat/TomcatServer";
+import { WildflyController } from "../src/Wildfly/WildflyController";
+import { WildflyModel } from "../src/Wildfly/WildflyModel";
+import { WildflyServer } from "../src/Wildfly/WildflyServer";
 import { Utility } from "../src/Utility";
 
 suite('Error input', () => {
-  const serverInfo: TomcatServer = undefined;
-  const tomcatModel: TomcatController = new TomcatController(new TomcatModel(''), undefined);
+  const serverInfo: WildflyServer = undefined;
+  const wildflyModel: WildflyController = new WildflyController(new WildflyModel(''), undefined);
   test('stopServer', async () => {
     try {
-      await tomcatModel.stopOrRestartServer(serverInfo);
+      await wildflyModel.stopOrRestartServer(serverInfo);
       assert.fail('Resolve', 'Reject');
     } catch (error) {
       assert.equal(error.toString(), `Error: ${DialogMessage.noServer}`);
@@ -20,7 +20,7 @@ suite('Error input', () => {
   });
   test('runOnServer', async () => {
     try {
-      await tomcatModel.runOrDebugOnServer(undefined);
+      await wildflyModel.runOrDebugOnServer(undefined);
     } catch (error) {
       assert.equal(error.toString(), `Error: ${DialogMessage.noServer}`);
     }

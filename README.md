@@ -2,7 +2,7 @@
 
 ## Usage
 
-![start and run](resources/Tomcat.gif)
+![start and run](resources/Wildfly.gif)
 
 ## Features
 * Add Wildfly Server from Wildfly Install Path
@@ -21,7 +21,7 @@
 * Delete deployed war package
 
 ## Prerequisites
-* [Apache Tomcat](http://tomcat.apache.org/)
+* [Wildfly](https://www.wildfly.org/)
 * [Debugger for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug) (for debuging war package)
 
 ## Install

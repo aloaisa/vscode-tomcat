@@ -6,10 +6,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import * as Constants from "../Constants";
 import { Utility } from "../Utility";
-import { TomcatServer } from "./TomcatServer";
+import { WildflyServer } from "./WildflyServer";
 
-export class TomcatModel {
-    private _serverList: TomcatServer[] = [];
+export class WildflyModel {
+    private _serverList: WildflyServer[] = [];
     private _serversJsonFile: string;
 
     constructor(public defaultStoragePath: string) {
@@ -22,33 +22,28 @@ export class TomcatModel {
         });
     }
 
-    public getServerSet(): TomcatServer[] {
+    public getServerSet(): WildflyServer[] {
         return this._serverList;
     }
 
-    public getTomcatServer(serverName: string): TomcatServer | undefined {
-        return this._serverList.find((item: TomcatServer) => item.getName() === serverName);
+    public getWildflyServer(serverName: string): WildflyServer | undefined {
+        return this._serverList.find((item: WildflyServer) => item.getName() === serverName);
     }
 
     public async saveServerList(): Promise<void> {
         try {
-            await fse.outputJson(this._serversJsonFile, this._serverList.map((s: TomcatServer) => {
+            await fse.outputJson(this._serversJsonFile, this._serverList.map((s: WildflyServer) => {
                 return { _name: s.getName(), _installPath: s.getInstallPath(), _storagePath: s.getStoragePath() };
             }));
-            vscode.commands.executeCommand('tomcat.tree.refresh');
+            vscode.commands.executeCommand('wildfly.tree.refresh');
         } catch (err) {
             console.error(err.toString());
         }
     }
 
     public async updateJVMOptions(serverName: string) : Promise<void> {
-        const server: TomcatServer = this.getTomcatServer(serverName);
-        const installPath: string = server.getInstallPath();
-        const catalinaBase: string = server.getStoragePath();
-        const bootStrap: string = path.join(installPath, 'bin', 'bootstrap.jar');
-        const tomcat: string = path.join(installPath, 'bin', 'tomcat-juli.jar');
+        const server: WildflyServer = this.getWildflyServer(serverName);
         let result: string[] = [];
-
         const filterFunction: (para: string) => boolean = (para: string): boolean => {
             if (!para.startsWith('-')) {
                 return false;
@@ -65,12 +60,12 @@ export class TomcatModel {
         result = result.concat(await Utility.readFileLineByLine(server.jvmOptionFile, filterFunction));
         server.jvmOptions = result;
     }
-    public deleteServer(tomcatServer: TomcatServer): boolean {
-        const index: number = this._serverList.findIndex((item: TomcatServer) => item.getName() === tomcatServer.getName());
+    public deleteServer(wildflyServer: WildflyServer): boolean {
+        const index: number = this._serverList.findIndex((item: WildflyServer) => item.getName() === wildflyServer.getName());
         if (index > -1) {
-            const oldServer: TomcatServer[] = this._serverList.splice(index, 1);
+            const oldServer: WildflyServer[] = this._serverList.splice(index, 1);
             if (!_.isEmpty(oldServer)) {
-                fse.remove(tomcatServer.getStoragePath());
+                fse.remove(wildflyServer.getStoragePath());
                 this.saveServerList();
                 return true;
             }
@@ -79,18 +74,18 @@ export class TomcatModel {
         return false;
     }
 
-    public addServer(tomcatServer: TomcatServer): void {
-        const index: number = this._serverList.findIndex((item: TomcatServer) => item.getName() === tomcatServer.getName());
+    public addServer(wildflyServer: WildflyServer): void {
+        const index: number = this._serverList.findIndex((item: WildflyServer) => item.getName() === wildflyServer.getName());
         if (index > -1) {
             this._serverList.splice(index, 1);
         }
-        this._serverList.push(tomcatServer);
+        this._serverList.push(wildflyServer);
         this.saveServerList();
     }
 
     public saveServerListSync(): void {
         try {
-            fse.outputJsonSync(this._serversJsonFile, this._serverList.map((s: TomcatServer) => {
+            fse.outputJsonSync(this._serversJsonFile, this._serverList.map((s: WildflyServer) => {
                 return { _name: s.getName(), _installPath: s.getInstallPath(), _storagePath: s.getStoragePath() };
             }));
         } catch (err) {
@@ -105,7 +100,7 @@ export class TomcatModel {
                 if (!_.isEmpty(objArray)) {
                     this._serverList = this._serverList.concat(objArray.map(
                         (obj: { _name: string, _installPath: string, _storagePath: string }) => {
-                            return new TomcatServer(obj._name, obj._installPath, obj._storagePath);
+                            return new WildflyServer(obj._name, obj._installPath, obj._storagePath);
                         }));
                 }
             }
@@ -115,7 +110,7 @@ export class TomcatModel {
     }
 
     private clearServerDebugInfo(basePathName: string): void {
-        const server: TomcatServer = this._serverList.find((s: TomcatServer) => { return s.basePathName === basePathName; });
+        const server: WildflyServer = this._serverList.find((s: WildflyServer) => { return s.basePathName === basePathName; });
         if (server) {
             server.clearDebugInfo();
         }
