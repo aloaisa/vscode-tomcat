@@ -68,7 +68,7 @@ export class WildflyController {
 
     public async deleteWarPackage(warPackage: WarPackage): Promise<void> {
         if (warPackage) {
-            await fse.remove(warPackage.storagePath);
+            await fse.remove(warPackage.storagePath + '.war');
             vscode.commands.executeCommand('wildfly.tree.refresh');
         }
     }
@@ -385,7 +385,7 @@ export class WildflyController {
             request: 'attach',
             hostName: 'localhost',
             port: server.getDebugPort(),
-            timeout: 10000
+            timeout: 1000
         };
         Utility.trackTelemetryStep('start debug');
         setTimeout(() => vscode.debug.startDebugging(server.getDebugWorkspace(), config), 500);
