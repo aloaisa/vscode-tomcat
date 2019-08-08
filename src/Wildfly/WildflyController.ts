@@ -54,7 +54,6 @@ export class WildflyController {
     public async browseWarPackage(warPackage: WarPackage): Promise<void> {
         if (warPackage) {
             const server: WildflyServer = this._wildflyModel.getWildflyServer(warPackage.serverName);
-            const httpPort: string = await Utility.getPort(server.getServerConfigPath(), Constants.PortKind.Http);
             if (!server.isStarted()) {
                 const result: MessageItem = await vscode.window.showInformationMessage(DialogMessage.startServer, DialogMessage.yes, DialogMessage.no);
                 if (result === DialogMessage.yes) {
@@ -62,8 +61,8 @@ export class WildflyController {
                     this.startServer(server);
                 }
             }
-            Utility.trackTelemetryStep('browse war');
-            opn(new URL(warPackage.label, `${Constants.LOCALHOST}:${httpPort}`).toString());
+
+            this.openBrowserWithUrkContext(server);
         }
     }
 
@@ -245,29 +244,7 @@ export class WildflyController {
                 this.startServer(wildflyServer);
             }
 
-            if (!wildflyServer.getBaseUrlContext()) {
-                let urlContext: string = await vscode.window.showInputBox({
-                    prompt: 'input the url context (example: suat/chebro)',
-                    validateInput: (name: string): string => {
-                        if (name && !name.match(/^.*$/)) {
-                            return 'please input a valid url context';
-                        }
-                        return null;
-                    }
-                });
-                if (!urlContext) {
-                    urlContext = '';
-                }
-                Utility.trackTelemetryStep('set url context');
-                wildflyServer.setBaseUrlContext(urlContext);
-                await this._wildflyModel.saveServerList();
-            }
-
-            Utility.trackTelemetryStep('get http port');
-            const httpPort: string = await Utility.getPort(wildflyServer.getServerConfigPath(), Constants.PortKind.Http);
-            Utility.trackTelemetryStep('browse server');
-            const url = new URL(`${Constants.LOCALHOST}:${httpPort}`).toString() + wildflyServer.getBaseUrlContext();
-            opn(url);
+            this.openBrowserWithUrkContext(wildflyServer);
         }
     }
 
@@ -481,4 +458,31 @@ export class WildflyController {
         }
         return wildflyServer ? wildflyServer : await this.selectServer();
     }
+
+    private async openBrowserWithUrkContext(wildflyServer: WildflyServer): Promise<void> {
+        if (!wildflyServer.getBaseUrlContext()) {
+            let urlContext: string = await vscode.window.showInputBox({
+                prompt: 'input the url context (example: suat/chebro)',
+                validateInput: (name: string): string => {
+                    if (name && !name.match(/^.*$/)) {
+                        return 'please input a valid url context';
+                    }
+                    return null;
+                }
+            });
+            if (!urlContext) {
+                urlContext = '';
+            }
+            Utility.trackTelemetryStep('set url context');
+            wildflyServer.setBaseUrlContext(urlContext);
+            await this._wildflyModel.saveServerList();
+        }
+
+        Utility.trackTelemetryStep('get http port');
+        const httpPort: string = await Utility.getPort(wildflyServer.getServerConfigPath(), Constants.PortKind.Http);
+        Utility.trackTelemetryStep('browse server');
+        const url = new URL(`${Constants.LOCALHOST}:${httpPort}`).toString() + wildflyServer.getBaseUrlContext();
+        opn(url);
+    }
+
 }

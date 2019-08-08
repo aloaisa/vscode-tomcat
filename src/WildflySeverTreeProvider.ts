@@ -37,7 +37,7 @@ export class WildflySeverTreeProvider implements vscode.TreeDataProvider<TreeIte
             });
         } else if (element.contextValue === ServerState.IdleServer || element.contextValue === ServerState.RunningServer) {
             const server: WildflyServer = <WildflyServer>element;
-            const webapps: string = path.join(server.getStoragePath(), 'webapps');
+            const webapps: string = path.join(server.getStoragePath(), 'standalone/deployments');
             const iconPath: string = this._context.asAbsolutePath(path.join('resources', 'war.jpg'));
             if (await fse.pathExists(webapps)) {
                 const wars: string[] = [];
