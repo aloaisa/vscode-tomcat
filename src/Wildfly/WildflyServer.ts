@@ -17,6 +17,7 @@ export class WildflyServer extends vscode.TreeItem implements vscode.QuickPickIt
     private _debugPort: number;
     private _debugWorkspace: vscode.WorkspaceFolder;
     private _configurationPath: string;
+    private _baseUrlContext: string;
 
     constructor(private _name: string, private _installPath: string, private _storagePath: string) {
         super(_name);
@@ -86,5 +87,13 @@ export class WildflyServer extends vscode.TreeItem implements vscode.QuickPickIt
 
     public getStoragePath(): string {
         return this._storagePath;
+    }
+
+    public setBaseUrlContext(baseUrl: string): void {
+        this._baseUrlContext = baseUrl;
+    }
+
+    public getBaseUrlContext(): string {
+        return this._baseUrlContext;
     }
 }

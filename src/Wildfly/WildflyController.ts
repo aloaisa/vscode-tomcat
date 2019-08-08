@@ -244,12 +244,30 @@ export class WildflyController {
                 }
                 this.startServer(wildflyServer);
             }
+
+            if (!wildflyServer.getBaseUrlContext()) {
+                let urlContext: string = await vscode.window.showInputBox({
+                    prompt: 'input the url context (example: suat/chebro)',
+                    validateInput: (name: string): string => {
+                        if (name && !name.match(/^.*$/)) {
+                            return 'please input a valid url context';
+                        }
+                        return null;
+                    }
+                });
+                if (!urlContext) {
+                    urlContext = '';
+                }
+                Utility.trackTelemetryStep('set url context');
+                wildflyServer.setBaseUrlContext(urlContext);
+                await this._wildflyModel.saveServerList();
+            }
+
             Utility.trackTelemetryStep('get http port');
             const httpPort: string = await Utility.getPort(wildflyServer.getServerConfigPath(), Constants.PortKind.Http);
-
-
             Utility.trackTelemetryStep('browse server');
-            opn(new URL(`${Constants.LOCALHOST}:${httpPort}`).toString());
+            const url = new URL(`${Constants.LOCALHOST}:${httpPort}`).toString() + wildflyServer.getBaseUrlContext();
+            opn(url);
         }
     }
 
