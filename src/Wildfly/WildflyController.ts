@@ -246,6 +246,8 @@ export class WildflyController {
             }
             Utility.trackTelemetryStep('get http port');
             const httpPort: string = await Utility.getPort(wildflyServer.getServerConfigPath(), Constants.PortKind.Http);
+
+
             Utility.trackTelemetryStep('browse server');
             opn(new URL(`${Constants.LOCALHOST}:${httpPort}`).toString());
         }
@@ -365,7 +367,8 @@ export class WildflyController {
             await fse.remove(deploymentsDirectory);
             await fse.mkdirs(deploymentsDirectory);
 
-            await Utility.executeCMD(this._outputChannel, server.getName(), 'cp', { shell: true }, '\"' + webappPath + '\"', '\"' + deploymentsDirectory + 'suat.war\"');
+            const warFile = path.basename(webappPath);
+            await Utility.executeCMD(this._outputChannel, server.getName(), 'cp', { shell: true }, '\"' + webappPath + '\"', '\"' + deploymentsDirectory + warFile + '\"');
         } else {
             Utility.trackTelemetryStep('no war file');
             throw new Error(DialogMessage.invalidWarFile);
